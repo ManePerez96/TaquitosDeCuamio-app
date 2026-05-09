@@ -14,9 +14,8 @@
 }
 
 body {
-font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+font-family: 'Segoe UI', sans-serif;
 background-color: #f0f2f5;
-color: var(--text);
 margin: 0;
 padding: 20px;
 display: flex;
@@ -33,14 +32,8 @@ width: 100%;
 max-width: 900px;
 }
 
-h1 {
-color: var(--primary);
-text-align: center;
-margin-top: 0;
-font-size: 2.5rem;
-}
+h1 { color: var(--primary); text-align: center; margin-top: 0; }
 
-/* Formulario */
 .form-group {
 display: grid;
 grid-template-columns: 1fr 2fr 150px auto;
@@ -49,7 +42,6 @@ margin-bottom: 25px;
 background: #f9f9f9;
 padding: 20px;
 border-radius: 10px;
-border: 1px solid #eee;
 }
 
 input, textarea {
@@ -58,101 +50,36 @@ border: 2px solid #ddd;
 border-radius: 8px;
 font-size: 1rem;
 outline: none;
-transition: border-color 0.3s;
 }
 
-input:focus, textarea:focus {
-border-color: var(--primary);
-}
-
-textarea {
-resize: vertical;
-min-height: 45px;
-font-family: inherit;
-}
+textarea { resize: vertical; min-height: 45px; font-family: inherit; }
 
 .btn-add {
-background-color: var(--primary);
+background: var(--primary);
 color: white;
 border: none;
-padding: 12px 25px;
+padding: 12px;
 border-radius: 8px;
 cursor: pointer;
 font-weight: bold;
-font-size: 1rem;
 transition: background 0.3s;
 }
 
-.btn-add:hover { background-color: #c1121f; }
+.btn-add:hover { background: #c1121f; }
 
-.btn-sort {
-background-color: var(--accent);
-color: var(--text);
-border: none;
-padding: 10px 15px;
-border-radius: 6px;
-cursor: pointer;
-font-weight: bold;
-margin-bottom: 15px;
-display: flex;
-align-items: center;
-gap: 5px;
-}
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 
-/* Tabla */
-table {
-width: 100%;
-border-collapse: collapse;
-margin-top: 10px;
-}
+th { background: var(--text); color: white; padding: 12px; text-align: left; }
 
-th {
-background-color: var(--text);
-color: white;
-padding: 15px;
-text-align: left;
-text-transform: uppercase;
-font-size: 0.85rem;
-letter-spacing: 1px;
-}
+td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; white-space: pre-line; }
 
-td {
-padding: 15px;
-border-bottom: 1px solid #eee;
-vertical-align: top;
-white-space: pre-line; /* Permite saltos de línea visuales */
-}
+tr.ready { background: var(--success); text-decoration: line-through; opacity: 0.6; }
 
-tr:hover { background-color: #fafafa; }
+.btn-delete { background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; padding: 5px 10px; }
 
-tr.ready {
-background-color: var(--success);
-text-decoration: line-through;
-color: #777;
-}
+input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
 
-.checkbox-cell { text-align: center; width: 60px; }
-
-input[type="checkbox"] {
-width: 20px;
-height: 20px;
-cursor: pointer;
-}
-
-.btn-delete {
-background: #666;
-color: white;
-border: none;
-padding: 6px 10px;
-border-radius: 4px;
-cursor: pointer;
-}
-
-.btn-delete:hover { background: #333; }
-
-@media (max-width: 750px) {
-.form-group { grid-template-columns: 1fr; }
-}
+@media (max-width: 750px) { .form-group { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -160,20 +87,13 @@ cursor: pointer;
 <h1>🌮 Taquitos de Cuamio</h1>
 
 <div class="container">
-<!-- Formulario de entrada -->
 <div class="form-group">
 <input type="text" id="nombre" placeholder="Nombre del cliente">
-<textarea id="orden" placeholder="Pedido (puedes usar Enter para saltar línea)"></textarea>
+<textarea id="orden" placeholder="Pedido (puedes dar saltos de línea)"></textarea>
 <input type="time" id="hora">
-<button class="btn-add" onclick="agregarPedido()">Agregar</button>
+<button class="btn-add" onclick="agregarPedido()">Agregar Pedido</button>
 </div>
 
-<!-- Botón de ordenamiento -->
-<button class="btn-sort" onclick="ordenarPorHora()">
-🕒 Ordenar por Hora
-</button>
-
-<!-- Tabla de resultados -->
 <table id="tablaPedidos">
 <thead>
 <tr>
@@ -181,110 +101,99 @@ cursor: pointer;
 <th>Nombre</th>
 <th>Orden</th>
 <th>Hora</th>
-<th>Acción</th>
+<th>Borrar</th>
 </tr>
 </thead>
-<tbody>
-<!-- Los datos se cargan aquí -->
-</tbody>
+<tbody></tbody>
 </table>
 </div>
 
-<script>
-// --- PERSISTENCIA DE DATOS ---
+<!-- CARGA DE MÓDULOS DE FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update, remove }
+from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
-// Cargar datos al abrir la página
-document.addEventListener('DOMContentLoaded', () => {
-const guardados = localStorage.getItem('mis_pedidos_tacos');
-if (guardados) {
-const pedidos = JSON.parse(guardados);
-pedidos.forEach(p => crearFila(p.nombre, p.orden, p.hora, p.listo));
-}
+// Tu configuración de Firebase proporcionada
+const firebaseConfig = {
+apiKey: "AIzaSyC8-WKFkouJA5P7QBzv23QMq9LbiWtU5g0",
+authDomain: "taquitosdecuamiocloud.firebaseapp.com",
+projectId: "taquitosdecuamiocloud",
+storageBucket: "taquitosdecuamiocloud.firebasestorage.app",
+messagingSenderId: "938261728188",
+appId: "1:938261728188:web:ff8507e29abf9ab20b79b9",
+measurementId: "G-9T6P3ZH2RV"
+};
+
+// Inicialización
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const pedidosRef = ref(db, 'pedidos');
+
+// Función para AGREGAR pedido a la nube
+window.agregarPedido = function() {
+const nombre = document.getElementById('nombre').value;
+const orden = document.getElementById('orden').value;
+const hora = document.getElementById('hora').value;
+
+if (nombre.trim() && orden.trim()) {
+push(pedidosRef, {
+nombre: nombre,
+orden: orden,
+hora: hora || "--:--",
+listo: false
 });
-
-// Guardar estado actual en localStorage
-function guardarDatos() {
-const pedidos = [];
-document.querySelectorAll('#tablaPedidos tbody tr').forEach(tr => {
-pedidos.push({
-nombre: tr.cells[1].innerText,
-orden: tr.cells[2].innerText,
-hora: tr.dataset.time,
-listo: tr.querySelector('input[type="checkbox"]').checked
-});
-});
-localStorage.setItem('mis_pedidos_tacos', JSON.stringify(pedidos));
+// Limpiar campos
+document.getElementById('nombre').value = "";
+document.getElementById('orden').value = "";
+document.getElementById('hora').value = "";
+document.getElementById('nombre').focus();
+} else {
+alert("Por favor llena el nombre y la orden");
 }
+};
 
-// --- LÓGICA DE LA APLICACIÓN ---
-
-function agregarPedido() {
-const inputNombre = document.getElementById('nombre');
-const inputOrden = document.getElementById('orden');
-const inputHora = document.getElementById('hora');
-
-if (!inputNombre.value.trim() || !inputOrden.value.trim()) {
-alert("Por favor, ingresa al menos el nombre y el pedido.");
-return;
-}
-
-crearFila(inputNombre.value, inputOrden.value, inputHora.value, false);
-guardarDatos();
-
-// Limpiar y enfocar
-inputNombre.value = "";
-inputOrden.value = "";
-inputHora.value = "";
-inputNombre.focus();
-}
-
-function crearFila(nombre, orden, hora, listo) {
+// Escuchar cambios en TIEMPO REAL
+onValue(pedidosRef, (snapshot) => {
 const tbody = document.querySelector('#tablaPedidos tbody');
-const tr = document.createElement('tr');
+tbody.innerHTML = "";
+const data = snapshot.val();
 
-// Atributo para ordenar fácilmente
-tr.dataset.time = hora || "99:99";
-if (listo) tr.classList.add('ready');
+if (data) {
+// Convertimos a lista y ordenamos por hora
+const lista = Object.keys(data).map(id => ({ id, ...data[id] }));
+lista.sort((a, b) => a.hora.localeCompare(b.hora));
+
+lista.forEach(p => {
+const tr = document.createElement('tr');
+if (p.listo) tr.classList.add('ready');
 
 tr.innerHTML = `
-<td class="checkbox-cell">
-<input type="checkbox" ${listo ? 'checked' : ''} onchange="cambiarEstado(this)">
+<td style="text-align:center">
+<input type="checkbox" ${p.listo ? 'checked' : ''}
+onclick="cambiarEstado('${p.id}', ${!p.listo})">
 </td>
-<td><strong>${nombre}</strong></td>
-<td>${orden}</td>
-<td>${hora || '--:--'}</td>
-<td>
-<button class="btn-delete" onclick="eliminarPedido(this)">✕</button>
-</td>
+<td><strong>${p.nombre}</strong></td>
+<td>${p.orden}</td>
+<td>${p.hora}</td>
+<td><button class="btn-delete" onclick="eliminarPedido('${p.id}')">✕</button></td>
 `;
-
 tbody.appendChild(tr);
+});
 }
+});
 
-function cambiarEstado(cb) {
-const fila = cb.parentElement.parentElement;
-fila.classList.toggle('ready', cb.checked);
-guardarDatos();
+// Cambiar estado Listo/Pendiente en el servidor
+window.cambiarEstado = (id, nuevoEstado) => {
+update(ref(db, `pedidos/${id}`), { listo: nuevoEstado });
+};
+
+// Eliminar pedido del servidor
+window.eliminarPedido = (id) => {
+if(confirm("¿Seguro que quieres borrar este pedido?")) {
+remove(ref(db, `pedidos/${id}`));
 }
-
-function eliminarPedido(btn) {
-if(confirm("¿Eliminar este pedido?")) {
-btn.parentElement.parentElement.remove();
-guardarDatos();
-}
-}
-
-function ordenarPorHora() {
-const tbody = document.querySelector('#tablaPedidos tbody');
-const filas = Array.from(tbody.querySelectorAll('tr'));
-
-filas.sort((a, b) => a.dataset.time.localeCompare(b.dataset.time));
-
-// Re-insertar en orden
-filas.forEach(f => tbody.appendChild(f));
-guardarDatos(); // Guardar el nuevo orden
-}
+};
 </script>
-
 </body>
 </html>
