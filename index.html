@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taquitos de Cuamio</title>
+<style>
+:root {
+--primary: #e63946;
+--secondary: #f1faee;
+--accent: #ffb703;
+--text: #1d3557;
+--success: #d1ffcf;
+}
+
+body {
+font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+background-color: #f0f2f5;
+color: var(--text);
+margin: 0;
+padding: 20px;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+.container {
+background: white;
+padding: 2rem;
+border-radius: 15px;
+box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+width: 100%;
+max-width: 900px;
+}
+
+h1 {
+color: var(--primary);
+text-align: center;
+margin-top: 0;
+font-size: 2.5rem;
+}
+
+/* Formulario */
+.form-group {
+display: grid;
+grid-template-columns: 1fr 2fr 150px auto;
+gap: 15px;
+margin-bottom: 25px;
+background: #f9f9f9;
+padding: 20px;
+border-radius: 10px;
+border: 1px solid #eee;
+}
+
+input, textarea {
+padding: 12px;
+border: 2px solid #ddd;
+border-radius: 8px;
+font-size: 1rem;
+outline: none;
+transition: border-color 0.3s;
+}
+
+input:focus, textarea:focus {
+border-color: var(--primary);
+}
+
+textarea {
+resize: vertical;
+min-height: 45px;
+font-family: inherit;
+}
+
+.btn-add {
+background-color: var(--primary);
+color: white;
+border: none;
+padding: 12px 25px;
+border-radius: 8px;
+cursor: pointer;
+font-weight: bold;
+font-size: 1rem;
+transition: background 0.3s;
+}
+
+.btn-add:hover { background-color: #c1121f; }
+
+.btn-sort {
+background-color: var(--accent);
+color: var(--text);
+border: none;
+padding: 10px 15px;
+border-radius: 6px;
+cursor: pointer;
+font-weight: bold;
+margin-bottom: 15px;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+/* Tabla */
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 10px;
+}
+
+th {
+background-color: var(--text);
+color: white;
+padding: 15px;
+text-align: left;
+text-transform: uppercase;
+font-size: 0.85rem;
+letter-spacing: 1px;
+}
+
+td {
+padding: 15px;
+border-bottom: 1px solid #eee;
+vertical-align: top;
+white-space: pre-line; /* Permite saltos de línea visuales */
+}
+
+tr:hover { background-color: #fafafa; }
+
+tr.ready {
+background-color: var(--success);
+text-decoration: line-through;
+color: #777;
+}
+
+.checkbox-cell { text-align: center; width: 60px; }
+
+input[type="checkbox"] {
+width: 20px;
+height: 20px;
+cursor: pointer;
+}
+
+.btn-delete {
+background: #666;
+color: white;
+border: none;
+padding: 6px 10px;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.btn-delete:hover { background: #333; }
+
+@media (max-width: 750px) {
+.form-group { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<h1>🌮 Taquitos de Cuamio</h1>
+
+<div class="container">
+<!-- Formulario de entrada -->
+<div class="form-group">
+<input type="text" id="nombre" placeholder="Nombre del cliente">
+<textarea id="orden" placeholder="Pedido (puedes usar Enter para saltar línea)"></textarea>
+<input type="time" id="hora">
+<button class="btn-add" onclick="agregarPedido()">Agregar</button>
+</div>
+
+<!-- Botón de ordenamiento -->
+<button class="btn-sort" onclick="ordenarPorHora()">
+🕒 Ordenar por Hora
+</button>
+
+<!-- Tabla de resultados -->
+<table id="tablaPedidos">
+<thead>
+<tr>
+<th>Listo</th>
+<th>Nombre</th>
+<th>Orden</th>
+<th>Hora</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody>
+<!-- Los datos se cargan aquí -->
+</tbody>
+</table>
+</div>
+
+<script>
+// --- PERSISTENCIA DE DATOS ---
+
+// Cargar datos al abrir la página
+document.addEventListener('DOMContentLoaded', () => {
+const guardados = localStorage.getItem('mis_pedidos_tacos');
+if (guardados) {
+const pedidos = JSON.parse(guardados);
+pedidos.forEach(p => crearFila(p.nombre, p.orden, p.hora, p.listo));
+}
+});
+
+// Guardar estado actual en localStorage
+function guardarDatos() {
+const pedidos = [];
+document.querySelectorAll('#tablaPedidos tbody tr').forEach(tr => {
+pedidos.push({
+nombre: tr.cells[1].innerText,
+orden: tr.cells[2].innerText,
+hora: tr.dataset.time,
+listo: tr.querySelector('input[type="checkbox"]').checked
+});
+});
+localStorage.setItem('mis_pedidos_tacos', JSON.stringify(pedidos));
+}
+
+// --- LÓGICA DE LA APLICACIÓN ---
+
+function agregarPedido() {
+const inputNombre = document.getElementById('nombre');
+const inputOrden = document.getElementById('orden');
+const inputHora = document.getElementById('hora');
+
+if (!inputNombre.value.trim() || !inputOrden.value.trim()) {
+alert("Por favor, ingresa al menos el nombre y el pedido.");
+return;
+}
+
+crearFila(inputNombre.value, inputOrden.value, inputHora.value, false);
+guardarDatos();
+
+// Limpiar y enfocar
+inputNombre.value = "";
+inputOrden.value = "";
+inputHora.value = "";
+inputNombre.focus();
+}
+
+function crearFila(nombre, orden, hora, listo) {
+const tbody = document.querySelector('#tablaPedidos tbody');
+const tr = document.createElement('tr');
+
+// Atributo para ordenar fácilmente
+tr.dataset.time = hora || "99:99";
+if (listo) tr.classList.add('ready');
+
+tr.innerHTML = `
+<td class="checkbox-cell">
+<input type="checkbox" ${listo ? 'checked' : ''} onchange="cambiarEstado(this)">
+</td>
+<td><strong>${nombre}</strong></td>
+<td>${orden}</td>
+<td>${hora || '--:--'}</td>
+<td>
+<button class="btn-delete" onclick="eliminarPedido(this)">✕</button>
+</td>
+`;
+
+tbody.appendChild(tr);
+}
+
+function cambiarEstado(cb) {
+const fila = cb.parentElement.parentElement;
+fila.classList.toggle('ready', cb.checked);
+guardarDatos();
+}
+
+function eliminarPedido(btn) {
+if(confirm("¿Eliminar este pedido?")) {
+btn.parentElement.parentElement.remove();
+guardarDatos();
+}
+}
+
+function ordenarPorHora() {
+const tbody = document.querySelector('#tablaPedidos tbody');
+const filas = Array.from(tbody.querySelectorAll('tr'));
+
+filas.sort((a, b) => a.dataset.time.localeCompare(b.dataset.time));
+
+// Re-insertar en orden
+filas.forEach(f => tbody.appendChild(f));
+guardarDatos(); // Guardar el nuevo orden
+}
+</script>
+
+</body>
+</html>
