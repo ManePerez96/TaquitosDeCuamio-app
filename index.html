@@ -3,176 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taquitos de Cuamio - Responsivo</title>
+    <title>Taquitos de Cuamio - Control Profesional</title>
     <style>
         :root {
             --primary: #e63946;
-            --secondary: #f1faee;
             --accent: #ffb703;
-            --text: #1d3557;
-            --success: #d1ffcf;
-            --edit: #457b9d;
-            --price-color: #2a9d8f;
-            --divider: #ccc;
+            --success-bg: #d1ffcf;
+            --success-text: #2a9d8f;
+            --danger: #ff5151;
+            --whatsapp: #25d366;
+            --dark: #1d3557;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 10px; /* Menos padding en móviles */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 10px;
+            display: flex; justify-content: center;
             min-height: 100vh;
-            background-image: url('https://raw.githubusercontent.com/ManePerez96/TaquitosDeCuamio-app/main/tacos%202.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background: url('https://raw.githubusercontent.com/ManePerez96/TaquitosDeCuamio-app/main/tacos%202.png') center/cover fixed;
         }
 
         body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.3); 
-            z-index: -1;
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.2); z-index: -1;
         }
 
-        .container {
-            background: rgba(0, 0, 0, 0.92);
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 100%;
-            max-width: 1100px;
+        /* --- CONTENEDOR LOGIN --- */
+        #login-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; max-width: 400px; margin-top: 50px;
+        }
+
+        .login-card {
+            background: rgba(0, 0, 0, 0.92); padding: 2.5rem; border-radius: 15px;
+            width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; color: white;
             box-sizing: border-box;
         }
 
-        .header-logo { text-align: center; margin-bottom: 20px; }
-        .header-logo img {
-            width: 100%;
-            max-width: 350px;
-            height: auto;
-            filter: drop-shadow(2px 2px 10px rgba(0,0,0,0.8));
+        .login-card input {
+            width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px;
+            border: none; box-sizing: border-box; font-size: 1rem;
         }
 
-        /* Barra de Precio Responsiva */
+        .btn-entrar {
+            width: 100%; background: var(--accent); color: black; font-weight: bold;
+            padding: 12px; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px;
+        }
+
+        .btn-espectador {
+            background: none; color: var(--accent); border: 1px solid var(--accent);
+            margin-top: 15px; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer;
+        }
+
+        /* --- PANEL PRINCIPAL --- */
+        #app-container {
+            display: none; width: 100%; max-width: 1100px;
+            background: rgba(0, 0, 0, 0.94); padding: 1.5rem; border-radius: 15px;
+            box-sizing: border-box; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+
+        .header-logo { text-align: center; margin-bottom: 20px; position: relative; }
+        .header-logo img { width: 100%; max-width: 300px; height: auto; }
+        
+        .btn-logout {
+            position: absolute; right: 0; top: 0; background: #555; color: white;
+            border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;
+        }
+
+        /* CONFIGURACIÓN Y FORMULARIO */
+        .admin-only { display: none; }
+
         .config-bar {
-            background: rgba(255, 210, 97, 0.9);
-            color: #000;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap; /* Permite que baje si no cabe */
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-weight: bold;
-            text-align: center;
+            background: rgba(255, 210, 97, 0.95); padding: 15px; border-radius: 10px;
+            margin-bottom: 20px; display: flex; justify-content: center; gap: 10px;
+            font-weight: bold; align-items: center; color: #000;
         }
 
-        .config-bar input {
-            width: 90px;
-            padding: 8px;
-            border-radius: 8px;
-            border: 2px solid #000;
-            text-align: center;
-            font-size: 1.1rem;
-        }
+        .config-bar input { width: 90px; padding: 8px; border-radius: 8px; border: 1px solid #000; text-align: center; font-weight: bold; }
 
-        /* Formulario Responsivo con CSS Grid */
         .form-group {
-            display: grid;
-            grid-template-columns: 1fr 2fr 130px auto; /* Layout Desktop */
-            gap: 10px;
-            margin-bottom: 25px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
+            display: grid; grid-template-columns: 1fr 2fr 130px auto; gap: 10px;
+            margin-bottom: 25px; background: #fff; padding: 15px; border-radius: 10px;
         }
 
-        /* Tabla con scroll horizontal en móviles */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto; /* Scroll lateral activo */
-            background: white;
-            border-radius: 10px;
-        }
+        .form-group input, .form-group textarea { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
 
-        table { width: 100%; border-collapse: collapse; min-width: 600px; /* Evita que se aplaste demasiado */ }
-        th { background: rgb(255, 210, 97); color: #000; padding: 12px; text-align: left; font-size: 0.9rem; }
-        td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: top; color: #333; font-size: 0.9rem; }
+        /* TABLA */
+        .table-wrapper { width: 100%; overflow-x: auto; background: white; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: var(--accent); color: #000; padding: 15px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; color: #333; }
 
-        .price-tag { color: var(--price-color); font-weight: bold; font-size: 1.1rem; }
-        .actions { display: flex; gap: 5px; }
-        .btn-action { color: white; border: none; border-radius: 6px; cursor: pointer; padding: 8px; font-size: 0.9rem; }
-        .btn-delete { background: #ff5151; }
-        .btn-edit { background: #13aeeb; }
+        /* ESTADO LISTO (RESALTADO) */
+        tr.fila-lista { background-color: var(--success-bg) !important; }
+        tr.fila-lista td { text-decoration: line-through; color: #777; opacity: 0.7; }
+
+        /* ORDEN FORMATEADA */
+        .plato-bloque { border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
+        .plato-bloque:last-child { border-bottom: none; margin-bottom: 0; }
+        .item-linea { display: block; padding-left: 10px; line-height: 1.5; }
+
+        .price-tag { color: var(--success-text); font-weight: bold; font-size: 1.1rem; }
+
+        /* BOTONES DE ACCIÓN */
         .btn-main { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-whatsapp { background: var(--whatsapp); color: rgb(0, 0, 0); border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 30%; margin-top: 10px; font-size: 1rem; }
+        #btn-limpiar { background: var(--danger); display: none; margin-top: 15px; width: 30%; padding: 12px; border: none; border-radius: 8px; color: rgb(255, 255, 255); font-weight: bold; cursor: pointer; }
 
-        /* --- MEDIA QUERIES (MAGIA RESPONSIVA) --- */
-
-        /* Tablets y Celulares Grandes */
-        @media (max-width: 900px) {
-            .form-group {
-                grid-template-columns: 1fr 1fr; /* 2 columnas */
-            }
-            .btn-main { grid-column: span 2; } /* Botón ocupa todo el ancho */
-        }
-
-        /* Celulares Pequeños */
-        @media (max-width: 600px) {
-            .form-group {
-                grid-template-columns: 1fr; /* Todo en una sola columna */
-            }
-            .btn-main { grid-column: span 1; }
-            .header-logo img { max-width: 250px; }
-            .container { padding: 1rem; }
-            .config-bar span { font-size: 0.9rem; }
-        }
+        @media (max-width: 850px) { .form-group { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div id="login-container">
+        <div class="login-card">
+            <img src="https://raw.githubusercontent.com/ManePerez96/TaquitosDeCuamio-app/main/logotacos3.PNG" style="width: 220px; margin-bottom: 20px;">
+            <h3>Acceso al Sistema</h3>
+            <input type="email" id="login-email" placeholder="Correo Administrativo">
+            <input type="password" id="login-pass" placeholder="Contraseña">
+            <button class="btn-entrar" onclick="iniciarSesion()">Entrar como Admin</button>
+            <button class="btn-espectador" onclick="entrarComoEspectador()">Solo ver pedidos (Invitado)</button>
+        </div>
+    </div>
+
+    <div id="app-container">
         <div class="header-logo">
+            <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
             <img src="https://raw.githubusercontent.com/ManePerez96/TaquitosDeCuamio-app/main/logotacos3.PNG" alt="Logo">
         </div>
 
-        <div class="config-bar">
-            <span>💲 Precio por Taco: $</span>
-            <input type="number" id="precioUnitario" value="3.00" step="0.01" oninput="recalcularPreciosVisuales()">
-        </div>
+        <div id="seccion-admin" class="admin-only">
+            <div class="config-bar">
+                <span>💲 Precio por Taco: $</span>
+                <input type="number" id="precioUnitario" value="3.00" step="0.01" oninput="recalcularPreciosVisuales()">
+                <small>(Ajusta antes de enviar reporte)</small>
+            </div>
 
-        <div id="formulario" class="form-group">
-            <input type="text" id="nombre" placeholder="Nombre Cliente">
-            <textarea id="orden" placeholder="Pedido (ej: 3 suadero, 2 pastor)"></textarea>
-            <input type="time" id="hora">
-            <button id="btnPrincipal" class="btn-main" onclick="procesarPedido()">Agregar</button>
+            <div id="formulario" class="form-group">
+                <input type="text" id="nombre" placeholder="Nombre del Cliente">
+                <textarea id="orden" placeholder="ENTER: Plato diferente&#10;COMA: Detalle del plato"></textarea>
+                <input type="time" id="hora">
+                <button id="btnPrincipal" class="btn-main" onclick="procesarPedido()">Agregar Pedido</button>
+            </div>
+
+           
         </div>
 
         <div class="table-wrapper">
             <table id="tablaPedidos">
                 <thead>
                     <tr>
-                        <th style="width: 40px; text-align: center;">✓</th>
+                        <th class="admin-only" style="width: 50px; text-align: center;">✓</th>
                         <th>Cliente</th>
-                        <th>Orden</th>
-                        <th style="width: 70px;">Hora</th>
-                        <th style="width: 90px;">Total</th>
-                        <th style="width: 100px;">Acciones</th>
+                        <th>Orden Detallada</th>
+                        <th style="width: 80px; text-align: center;">Hora</th>
+                        <th style="width: 100px; text-align: center;">Total</th>
+                        <th class="admin-only" style="width: 110px; text-align: center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
+        <div id="seccion-admin" class="admin-only">
+            <button class="btn-whatsapp" onclick="enviarReporte()">
+                📱 Enviar Reporte de Ventas por WhatsApp
+            </button>
+            
+            <button id="btn-limpiar" onclick="limpiarBaseDatos()">
+                🗑️ BORRAR TODOS LOS PEDIDOS (Corte de Caja)
+            </button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, update, remove } 
-            from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC8-WKFkouJA5P7QBzv23QMq9LbiWtU5g0",
@@ -180,44 +186,80 @@
             projectId: "taquitosdecuamiocloud",
             storageBucket: "taquitosdecuamiocloud.firebasestorage.app",
             messagingSenderId: "938261728188",
-            appId: "1:938261728188:web:ff8507e29abf9ab20b79b9",
-            measurementId: "G-9T6P3ZH2RV"
+            appId: "1:938261728188:web:ff8507e29abf9ab20b79b9"
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
         const db = getDatabase(app);
         const pedidosRef = ref(db, 'pedidos');
 
+        let esAdmin = false;
         let idEnEdicion = null;
         let listaGlobal = {};
 
+        // --- MANEJO DE SESIÓN ---
+        window.iniciarSesion = () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            signInWithEmailAndPassword(auth, email, pass).catch(err => alert("Error: Acceso incorrecto"));
+        };
+
+        window.entrarComoEspectador = () => {
+            esAdmin = false;
+            mostrarApp();
+        };
+
+        window.cerrarSesion = () => signOut(auth).then(() => location.reload());
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                esAdmin = true;
+                mostrarApp();
+            }
+        });
+
+        function mostrarApp() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            if (esAdmin) {
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.style.display = el.tagName === 'TH' ? 'table-cell' : 'block';
+                });
+            }
+            renderizarTabla(listaGlobal);
+        }
+
+        // --- LÓGICA DE NEGOCIO ---
         function obtenerCantidadTacos(texto) {
             const numeros = texto.match(/\d+/g);
             return numeros ? numeros.reduce((acc, num) => acc + parseInt(num), 0) : 0;
         }
 
-        window.recalcularPreciosVisuales = () => renderizarTabla(listaGlobal);
-
         function formatearOrden(texto) {
-            return texto.split('\n').map(bloque => {
+            const bloques = texto.split('\n');
+            return bloques.map(bloque => {
                 if(!bloque.trim()) return "";
-                const items = bloque.split(',').map(item => item.trim() ? `• ${item.trim()}<br>` : "").join('');
-                return `<div style="margin-bottom:5px; border-bottom:1px solid #eee;">${items}</div>`;
+                const items = bloque.split(',').map(item => 
+                    item.trim() ? `<span class="item-linea">• ${item.trim()}</span>` : ""
+                ).join('');
+                return `<div class="plato-bloque">${items}</div>`;
             }).join('');
         }
+
+        window.recalcularPreciosVisuales = () => renderizarTabla(listaGlobal);
 
         window.procesarPedido = function() {
             const nombre = document.getElementById('nombre').value;
             const orden = document.getElementById('orden').value;
             const hora = document.getElementById('hora').value;
+            if (!nombre.trim() || !orden.trim()) return alert("Completa nombre y orden.");
 
-            if (!nombre.trim() || !orden.trim()) return alert("Completa los campos.");
             const datos = { nombre, orden, hora: hora || "--:--", listo: false };
-
             if (idEnEdicion) {
                 update(ref(db, `pedidos/${idEnEdicion}`), datos);
                 idEnEdicion = null;
-                document.getElementById('btnPrincipal').innerText = "Agregar";
+                document.getElementById('btnPrincipal').innerText = "Agregar Pedido";
             } else {
                 push(pedidosRef, datos);
             }
@@ -227,46 +269,80 @@
         };
 
         onValue(pedidosRef, (snapshot) => {
-            listaGlobal = snapshot.val();
+            listaGlobal = snapshot.val() || {};
             renderizarTabla(listaGlobal);
         });
 
         function renderizarTabla(data) {
             const tbody = document.querySelector('#tablaPedidos tbody');
-            const precioBase = parseFloat(document.getElementById('precioUnitario').value) || 0;
+            const precioBase = parseFloat(document.getElementById('precioUnitario')?.value || 3.00);
             tbody.innerHTML = "";
-            if (data) {
-                const lista = Object.keys(data).map(id => ({ id, ...data[id] }));
-                lista.sort((a, b) => a.hora.localeCompare(b.hora));
-                lista.forEach(p => {
-                    const totalCalculado = (obtenerCantidadTacos(p.orden) * precioBase).toFixed(2);
-                    const fila = document.createElement('tr');
-                    if (p.listo) fila.style.opacity = "0.4";
-                    fila.innerHTML = `
-                        <td style="text-align:center"><input type="checkbox" ${p.listo ? 'checked' : ''} onclick="cambiarEstado('${p.id}', ${!p.listo})" style="transform:scale(1.3)"></td>
-                        <td><strong>${p.nombre}</strong></td>
-                        <td>${formatearOrden(p.orden)}</td>
-                        <td>${p.hora}</td>
-                        <td class="price-tag">$${totalCalculado}</td>
-                        <td class="actions">
-                            <button class="btn-action btn-edit" onclick="cargarEdicion('${p.id}', '${p.nombre}', \`${p.orden.replace(/`/g, '\\`')}\`, '${p.hora}')">✏️</button>
-                            <button class="btn-action btn-delete" onclick="eliminarPedido('${p.id}')">✕</button>
-                        </td>`;
-                    tbody.appendChild(fila);
-                });
-            }
+            
+            const lista = Object.keys(data).map(id => ({ id, ...data[id] }));
+            lista.sort((a, b) => a.hora.localeCompare(b.hora));
+
+            lista.forEach(p => {
+                const subtotal = (obtenerCantidadTacos(p.orden) * precioBase).toFixed(2);
+                const fila = document.createElement('tr');
+                if (p.listo) fila.classList.add('fila-lista');
+
+                fila.innerHTML = `
+                    ${esAdmin ? `<td style="text-align:center"><input type="checkbox" ${p.listo ? 'checked' : ''} onclick="cambiarEstado('${p.id}', ${!p.listo})"></td>` : ''}
+                    <td><strong>${p.nombre}</strong></td>
+                    <td>${formatearOrden(p.orden)}</td>
+                    <td style="text-align:center">${p.hora}</td>
+                    <td class="price-tag" style="text-align:center">$${subtotal}</td>
+                    ${esAdmin ? `<td style="text-align:center">
+                        <button style="background:#13aeeb; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;" onclick="cargarEdicion('${p.id}', '${p.nombre}', \`${p.orden.replace(/`/g, '\\`')}\`, '${p.hora}')">✏️</button>
+                        <button style="background:#ff5151; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;" onclick="eliminarPedido('${p.id}')">✕</button>
+                    </td>` : ''}
+                `;
+                tbody.appendChild(fila);
+            });
         }
 
-        window.cambiarEstado = (id, est) => update(ref(db, `pedidos/${id}`), { listo: est });
+        // --- REPORTES Y LIMPIEZA ---
+        window.enviarReporte = () => {
+            if (Object.keys(listaGlobal).length === 0) return alert("No hay pedidos.");
+            const precio = parseFloat(document.getElementById('precioUnitario').value);
+            let total = 0, tacos = 0, detalle = "";
+
+            Object.values(listaGlobal).forEach(p => {
+                let cant = obtenerCantidadTacos(p.orden);
+                tacos += cant; total += (cant * precio);
+                detalle += `• ${p.nombre}: ${cant} tacos ($${(cant * precio).toFixed(2)})\n`;
+            });
+
+            const fecha = new Date().toLocaleDateString();
+            const msg = `📊 *CORTE DE CAJA - TAQUITOS DE CUAMIO*\n📅 Fecha: ${fecha}\n\n${detalle}\n---------------------------\n🌮 *Total Tacos:* ${tacos}\n💰 *TOTAL VENTA:* $${total.toFixed(2)}\n---------------------------`;
+            
+            // CONFIGURA AQUÍ TU TELÉFONO (Ej: 521XXXXXXXXXX)
+            const miTelefono = "18155829171"; 
+            
+            window.open(`https://wa.me/${miTelefono}?text=${encodeURIComponent(msg)}`, '_blank');
+            if(esAdmin) document.getElementById('btn-limpiar').style.display = 'block';
+        };
+
+        window.limpiarBaseDatos = () => {
+            if(confirm("⚠️ ¿ESTÁS SEGURO? Se borrarán todos los pedidos de hoy para iniciar mañana en blanco.")) {
+                set(pedidosRef, null).then(() => {
+                    document.getElementById('btn-limpiar').style.display = 'none';
+                    alert("Base de datos limpia.");
+                });
+            }
+        };
+
+        // --- ACCIONES DE FILA ---
+        window.cambiarEstado = (id, est) => { if(esAdmin) update(ref(db, `pedidos/${id}`), { listo: est }); };
+        window.eliminarPedido = (id) => { if(esAdmin && confirm("¿Borrar pedido?")) remove(ref(db, `pedidos/${id}`)); };
         window.cargarEdicion = (id, nom, ord, hr) => {
             idEnEdicion = id;
             document.getElementById('nombre').value = nom;
             document.getElementById('orden').value = ord;
             document.getElementById('hora').value = hr === "--:--" ? "" : hr;
-            document.getElementById('btnPrincipal').innerText = "Guardar";
-            window.scrollTo(0, 0);
+            document.getElementById('btnPrincipal').innerText = "Guardar Cambios";
+            window.scrollTo(0,0);
         };
-        window.eliminarPedido = (id) => { if(confirm("¿Eliminar?")) remove(ref(db, `pedidos/${id}`)); };
     </script>
 </body>
 </html>
