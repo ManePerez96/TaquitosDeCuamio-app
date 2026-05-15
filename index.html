@@ -1,199 +1,274 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Taquitos de Cuamio</title>
-<style>
-:root {
---primary: #e63946;
---secondary: #f1faee;
---accent: #ffb703;
---text: #1d3557;
---success: #d1ffcf;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taquitos de Cuamio - Control de Pedidos</title>
+    <style>
+        :root {
+            --primary: #e63946;
+            --secondary: #f1faee;
+            --accent: #ffb703;
+            --text: #1d3557;
+            --success: #d1ffcf;
+            --edit: #457b9d;
+            --price-color: #2a9d8f;
+            --divider: #ccc;
+        }
 
-body {
-font-family: 'Segoe UI', sans-serif;
-background-color: #f0f2f5;
-margin: 0;
-padding: 20px;
-display: flex;
-flex-direction: column;
-align-items: center;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://raw.githubusercontent.com/ManePerez96/TaquitosDeCuamio-app/main/tacos%202.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
 
-.container {
-background: white;
-padding: 2rem;
-border-radius: 15px;
-box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-width: 100%;
-max-width: 900px;
-}
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.3); 
+            z-index: -1;
+        }
 
-h1 { color: var(--primary); text-align: center; margin-top: 0; }
+        .container {
+            background: rgba(0, 0, 0, 0.92);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 1100px;
+        }
 
-.form-group {
-display: grid;
-grid-template-columns: 1fr 2fr 150px auto;
-gap: 15px;
-margin-bottom: 25px;
-background: #f9f9f9;
-padding: 20px;
-border-radius: 10px;
-}
+        .header-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-input, textarea {
-padding: 12px;
-border: 2px solid #ddd;
-border-radius: 8px;
-font-size: 1rem;
-outline: none;
-}
+        .header-logo img {
+            max-width: 350px;
+            height: auto;
+            filter: drop-shadow(2px 2px 10px rgba(0,0,0,0.8));
+        }
 
-textarea { resize: vertical; min-height: 45px; font-family: inherit; }
+        /* Barra de Ajuste de Precio con soporte para decimales */
+        .config-bar {
+            background: rgba(255, 210, 97, 0.9);
+            color: #000;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
 
-.btn-add {
-background: var(--primary);
-color: white;
-border: none;
-padding: 12px;
-border-radius: 8px;
-cursor: pointer;
-font-weight: bold;
-transition: background 0.3s;
-}
+        .config-bar input {
+            width: 100px; /* Un poco más ancho para los decimales */
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #000;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
 
-.btn-add:hover { background: #c1121f; }
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 2fr 150px auto;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+        }
 
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        input, textarea { padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; }
+        
+        .btn-main {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-th { background: var(--text); color: white; padding: 12px; text-align: left; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        th { background: rgb(255, 210, 97); color: #000; padding: 15px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; color: #333; }
 
-td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; white-space: pre-line; }
+        .plato-bloque { display: block; padding: 8px 0; border-bottom: 1px solid var(--divider); }
+        .price-tag { color: var(--price-color); font-weight: bold; font-size: 1.2rem; text-align: center; }
+        .actions { display: flex; gap: 8px; justify-content: center; }
+        .btn-action { color: white; border: none; border-radius: 6px; cursor: pointer; padding: 8px 12px; }
+        .btn-delete { background: #ff5151; }
+        .btn-edit { background: #13aeeb; }
 
-tr.ready { background: var(--success); text-decoration: line-through; opacity: 0.6; }
-
-.btn-delete { background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; padding: 5px 10px; }
-
-input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
-
-@media (max-width: 750px) { .form-group { grid-template-columns: 1fr; } }
-</style>
+        tr.ready { background: var(--success) !important; opacity: 0.8; }
+        tr.ready td { text-decoration: line-through; }
+        
+        @media (max-width: 850px) { .form-group { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
 
-<h1>🌮 Taquitos de Cuamio</h1>
+    <div class="container">
+        <div class="header-logo">
+            <img src="https://raw.githubusercontent.com/ManePerez96/TaquitosDeCuamio-app/main/logotacos3.PNG" alt="Logo">
+        </div>
 
-<div class="container">
-<div class="form-group">
-<input type="text" id="nombre" placeholder="Nombre del cliente">
-<textarea id="orden" placeholder="Pedido (puedes dar saltos de línea)"></textarea>
-<input type="time" id="hora">
-<button class="btn-add" onclick="agregarPedido()">Agregar Pedido</button>
-</div>
+        <div class="config-bar">
+            <span>💲 Precio por Taco: $</span>
+            <input type="number" id="precioUnitario" value="3.00" step="0.01" oninput="recalcularPreciosVisuales()">
+            <small>Usa decimales si es necesario (ej. 3.50)</small>
+        </div>
 
-<table id="tablaPedidos">
-<thead>
-<tr>
-<th>Listo</th>
-<th>Nombre</th>
-<th>Orden</th>
-<th>Hora</th>
-<th>Borrar</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+        <div id="formulario" class="form-group">
+            <input type="text" id="nombre" placeholder="Nombre del Cliente">
+            <textarea id="orden" placeholder="Coma (,) para mismo plato. Enter para plato diferente."></textarea>
+            <input type="time" id="hora">
+            <button id="btnPrincipal" class="btn-main" onclick="procesarPedido()">Agregar Pedido</button>
+        </div>
 
-<!-- CARGA DE MÓDULOS DE FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, update, remove }
-from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+        <table id="tablaPedidos">
+            <thead>
+                <tr>
+                    <th style="width: 50px; text-align: center;">Listo</th>
+                    <th>Cliente</th>
+                    <th>Orden Detallada</th>
+                    <th style="width: 80px; text-align: center;">Hora</th>
+                    <th style="width: 100px; text-align: center;">Total</th>
+                    <th style="width: 120px; text-align: center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-// Tu configuración de Firebase proporcionada
-const firebaseConfig = {
-apiKey: "AIzaSyC8-WKFkouJA5P7QBzv23QMq9LbiWtU5g0",
-authDomain: "taquitosdecuamiocloud.firebaseapp.com",
-projectId: "taquitosdecuamiocloud",
-storageBucket: "taquitosdecuamiocloud.firebasestorage.app",
-messagingSenderId: "938261728188",
-appId: "1:938261728188:web:ff8507e29abf9ab20b79b9",
-measurementId: "G-9T6P3ZH2RV"
-};
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, update, remove } 
+            from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
-// Inicialización
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const pedidosRef = ref(db, 'pedidos');
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8-WKFkouJA5P7QBzv23QMq9LbiWtU5g0",
+            authDomain: "taquitosdecuamiocloud.firebaseapp.com",
+            projectId: "taquitosdecuamiocloud",
+            storageBucket: "taquitosdecuamiocloud.firebasestorage.app",
+            messagingSenderId: "938261728188",
+            appId: "1:938261728188:web:ff8507e29abf9ab20b79b9",
+            measurementId: "G-9T6P3ZH2RV"
+        };
 
-// Función para AGREGAR pedido a la nube
-window.agregarPedido = function() {
-const nombre = document.getElementById('nombre').value;
-const orden = document.getElementById('orden').value;
-const hora = document.getElementById('hora').value;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const pedidosRef = ref(db, 'pedidos');
 
-if (nombre.trim() && orden.trim()) {
-push(pedidosRef, {
-nombre: nombre,
-orden: orden,
-hora: hora || "--:--",
-listo: false
-});
-// Limpiar campos
-document.getElementById('nombre').value = "";
-document.getElementById('orden').value = "";
-document.getElementById('hora').value = "";
-document.getElementById('nombre').focus();
-} else {
-alert("Por favor llena el nombre y la orden");
-}
-};
+        let idEnEdicion = null;
+        let listaGlobal = {};
 
-// Escuchar cambios en TIEMPO REAL
-onValue(pedidosRef, (snapshot) => {
-const tbody = document.querySelector('#tablaPedidos tbody');
-tbody.innerHTML = "";
-const data = snapshot.val();
+        function obtenerCantidadTacos(texto) {
+            const numeros = texto.match(/\d+/g);
+            return numeros ? numeros.reduce((acc, num) => acc + parseInt(num), 0) : 0;
+        }
 
-if (data) {
-// Convertimos a lista y ordenamos por hora
-const lista = Object.keys(data).map(id => ({ id, ...data[id] }));
-lista.sort((a, b) => a.hora.localeCompare(b.hora));
+        window.recalcularPreciosVisuales = function() {
+            renderizarTabla(listaGlobal);
+        };
 
-lista.forEach(p => {
-const tr = document.createElement('tr');
-if (p.listo) tr.classList.add('ready');
+        function formatearOrden(texto) {
+            return texto.split('\n').map(bloque => {
+                if(!bloque.trim()) return "";
+                const items = bloque.split(',').map(item => item.trim() ? `<span style="display:block; padding-left:10px;">• ${item.trim()}</span>` : "").join('');
+                return `<div class="plato-bloque">${items}</div>`;
+            }).join('');
+        }
 
-tr.innerHTML = `
-<td style="text-align:center">
-<input type="checkbox" ${p.listo ? 'checked' : ''}
-onclick="cambiarEstado('${p.id}', ${!p.listo})">
-</td>
-<td><strong>${p.nombre}</strong></td>
-<td>${p.orden}</td>
-<td>${p.hora}</td>
-<td><button class="btn-delete" onclick="eliminarPedido('${p.id}')">✕</button></td>
-`;
-tbody.appendChild(tr);
-});
-}
-});
+        window.procesarPedido = function() {
+            const nombre = document.getElementById('nombre').value;
+            const orden = document.getElementById('orden').value;
+            const hora = document.getElementById('hora').value;
 
-// Cambiar estado Listo/Pendiente en el servidor
-window.cambiarEstado = (id, nuevoEstado) => {
-update(ref(db, `pedidos/${id}`), { listo: nuevoEstado });
-};
+            if (!nombre.trim() || !orden.trim()) return alert("Completa los campos.");
 
-// Eliminar pedido del servidor
-window.eliminarPedido = (id) => {
-if(confirm("¿Seguro que quieres borrar este pedido?")) {
-remove(ref(db, `pedidos/${id}`));
-}
-};
-</script>
+            const datos = { nombre, orden, hora: hora || "--:--", listo: false };
+
+            if (idEnEdicion) {
+                update(ref(db, `pedidos/${idEnEdicion}`), datos);
+                idEnEdicion = null;
+                document.getElementById('btnPrincipal').innerText = "Agregar Pedido";
+            } else {
+                push(pedidosRef, datos);
+            }
+            document.getElementById('nombre').value = "";
+            document.getElementById('orden').value = "";
+            document.getElementById('hora').value = "";
+        };
+
+        onValue(pedidosRef, (snapshot) => {
+            listaGlobal = snapshot.val();
+            renderizarTabla(listaGlobal);
+        });
+
+        function renderizarTabla(data) {
+            const tbody = document.querySelector('#tablaPedidos tbody');
+            const precioBase = parseFloat(document.getElementById('precioUnitario').value) || 0;
+            tbody.innerHTML = "";
+            
+            if (data) {
+                const lista = Object.keys(data).map(id => ({ id, ...data[id] }));
+                lista.sort((a, b) => a.hora.localeCompare(b.hora));
+
+                lista.forEach(p => {
+                    // CÁLCULO CON DECIMALES FORZADOS A 2 POSICIONES (.toFixed(2))
+                    const totalCalculado = (obtenerCantidadTacos(p.orden) * precioBase).toFixed(2);
+                    
+                    const fila = document.createElement('tr');
+                    if (p.listo) fila.classList.add('ready');
+
+                    fila.innerHTML = `
+                        <td style="text-align:center"><input type="checkbox" ${p.listo ? 'checked' : ''} onclick="cambiarEstado('${p.id}', ${!p.listo})"></td>
+                        <td><strong>${p.nombre}</strong></td>
+                        <td>${formatearOrden(p.orden)}</td>
+                        <td style="text-align:center">${p.hora}</td>
+                        <td class="price-tag">$${totalCalculado}</td>
+                        <td class="actions">
+                            <button class="btn-action btn-edit" onclick="cargarEdicion('${p.id}', '${p.nombre}', \`${p.orden.replace(/`/g, '\\`')}\`, '${p.hora}')">✏️</button>
+                            <button class="btn-action btn-delete" onclick="eliminarPedido('${p.id}')">✕</button>
+                        </td>
+                    `;
+                    tbody.appendChild(fila);
+                });
+            }
+        }
+
+        window.cambiarEstado = (id, est) => update(ref(db, `pedidos/${id}`), { listo: est });
+
+        window.cargarEdicion = (id, nom, ord, hr) => {
+            idEnEdicion = id;
+            document.getElementById('nombre').value = nom;
+            document.getElementById('orden').value = ord;
+            document.getElementById('hora').value = hr === "--:--" ? "" : hr;
+            document.getElementById('btnPrincipal').innerText = "Guardar Cambios";
+            window.scrollTo(0, 0);
+        };
+
+        window.eliminarPedido = (id) => {
+            if(confirm("¿Eliminar?")) remove(ref(db, `pedidos/${id}`));
+        };
+    </script>
 </body>
 </html>
